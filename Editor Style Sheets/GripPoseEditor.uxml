@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:DropdownField label="Editor Mode" index="0" choices="None, Visualize" name="ModeDropdown" />
+    <ui:VisualElement name="VisualizeMode" style="margin-top: 10px;">
+        <ui:Label text="Hand Pose Visualizer" display-tooltip-when-elided="true" style="-unity-text-align: upper-center;" />
+        <ui:DropdownField label="Hand" index="0" choices="Left, Right" name="VisualizeHandDropdown" />
+        <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-left: 2px;">
+            <ui:Label text="Radius" display-tooltip-when-elided="true" style="align-items: flex-end; justify-content: flex-start; margin-left: 0; margin-right: 5px;" />
+            <ui:Slider picking-mode="Ignore" name="VisualizeRadiusSlider" style="flex-grow: 1; height: 17px;" />
+            <ui:Label text="0" display-tooltip-when-elided="true" name="VisualizeRadiusNumber" style="align-items: flex-end; justify-content: flex-start; margin-left: 5px; margin-right: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-direction: row; align-items: stretch; justify-content: space-between; margin-left: 2px;">
+            <ui:Label text="Pry Rotation" display-tooltip-when-elided="true" style="margin-left: 0; margin-right: 5px;" />
+            <ui:Slider picking-mode="Ignore" name="VisualizePoseSlider" style="flex-grow: 1;" />
+            <ui:Label text="0, 0, 0" display-tooltip-when-elided="true" name="VisualizePryVector" style="margin-left: 5px; margin-right: 5px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
