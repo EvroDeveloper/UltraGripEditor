@@ -5,12 +5,12 @@
         <ui:DropdownField label="Hand" index="0" choices="Left, Right" name="VisualizeHandDropdown" />
         <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-left: 2px;">
             <ui:Label text="Radius" display-tooltip-when-elided="true" style="align-items: flex-end; justify-content: flex-start; margin-left: 0; margin-right: 5px;" />
-            <ui:Slider picking-mode="Ignore" name="VisualizeRadiusSlider" style="flex-grow: 1; height: 17px;" />
+            <ui:SliderInt picking-mode="Ignore" name="VisualizeRadiusSlider" style="flex-grow: 1;" />
             <ui:Label text="0" display-tooltip-when-elided="true" name="VisualizeRadiusNumber" style="align-items: flex-end; justify-content: flex-start; margin-left: 5px; margin-right: 5px;" />
         </ui:VisualElement>
         <ui:VisualElement style="flex-direction: row; align-items: stretch; justify-content: space-between; margin-left: 2px;">
             <ui:Label text="Pry Rotation" display-tooltip-when-elided="true" style="margin-left: 0; margin-right: 5px;" />
-            <ui:Slider picking-mode="Ignore" name="VisualizePoseSlider" style="flex-grow: 1;" />
+            <ui:SliderInt picking-mode="Ignore" name="VisualizePoseSlider" style="flex-grow: 1;" />
             <ui:Label text="0, 0, 0" display-tooltip-when-elided="true" name="VisualizePryVector" style="margin-left: 5px; margin-right: 5px;" />
         </ui:VisualElement>
     </ui:VisualElement>
