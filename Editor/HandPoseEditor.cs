@@ -159,7 +159,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         if(visualizerObject != null) GameObject.DestroyImmediate(visualizerObject);
         GameObject visualizerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(VISUALIZER_PATH);
         visualizerObject = GameObject.Instantiate(visualizerPrefab);
-        visualizerObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
+        //visualizerObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
         visualizer = visualizerObject.GetComponent<GripVisualizer>();
         visualizer.show = overlayMode != 0;
         visualizer.viewingHand = selectedHand;
