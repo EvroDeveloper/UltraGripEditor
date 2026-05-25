@@ -81,8 +81,10 @@ public class GripVisualizer : MonoBehaviour
         var handle = viewingLeft ? selectedPry.leftHandle : selectedPry.rightHandle;
         var artHandle = viewingLeft ? selectedPry.leftArtHandle : selectedPry.rightArtHandle;
 
+        artHandle = handle;
+
         SimpleTransform target = SimpleTransform.Create(gripTarget);
-        SimpleTransform artHandInWorld = target.Transform(artHandle.inverse);
+        SimpleTransform artHandInWorld = target.Transform(artHandle.inverse).Transform(Vector3.zero, Quaternion.Euler(-90, 90, 0));
 
         HandReference visualHand = viewingLeft ? leftHandReferences : rightHandReferences;
         SimpleTransform handBaseInWorld = artHandInWorld.Transform(visualHand.handBaseToHand.inverse);

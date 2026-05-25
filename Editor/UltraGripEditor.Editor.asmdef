@@ -1,5 +1,5 @@
 {
-    "name": "UltraGripEditor",
+    "name": "UltraGripEditor.Editor",
     "rootNamespace": "",
     "references": [
         "GUID:20441fdfffb12d24da9276657491883e",
