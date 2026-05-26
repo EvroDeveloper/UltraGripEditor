@@ -68,6 +68,8 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         Vector3 position = visualizer.viewingHandReferences.hand.position;
         Quaternion rotation = visualizer.viewingHandReferences.hand.rotation;
         Handles.TransformHandle(ref position, ref rotation);
+        if((visualizer.viewingHandReferences.hand.position - position).sqrMagnitude < 0.0001) position = visualizer.viewingHandReferences.hand.position;
+
         HandleConversion.HandleConfiguration resultingHandle = HandleConversion.WorldToGripHandle(visualizer.targetGrip, SimpleTransform.Create(position, rotation), visualizer.viewingHand);
         if(visualizer.viewingHand == SelectedHand.Left)
         {
