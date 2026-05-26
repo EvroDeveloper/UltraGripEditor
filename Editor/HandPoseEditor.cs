@@ -69,9 +69,9 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         Quaternion rotation = visualizer.viewingHandReferences.hand.rotation;
         Handles.TransformHandle(ref position, ref rotation);
         // Sometimes hand drifts off when not doing anything because im converting the positions in a lot of different spaces. Uhh fix maybe bc yea
-        if((visualizer.viewingHandReferences.hand.position - position).sqrMagnitude < 0.0001) position = visualizer.viewingHandReferences.hand.position;
+        if((visualizer.viewingHandReferences.hand.position - position).sqrMagnitude < 0.00001) position = visualizer.viewingHandReferences.hand.position;
         // same thing for rotation
-        if(Quaternion.Angle(visualizer.viewingHandReferences.hand.rotation, rotation) < 0.01) rotation = visualizer.viewingHandReferences.hand.rotation;
+        if(Quaternion.Angle(visualizer.viewingHandReferences.hand.rotation, rotation) < 0.1) rotation = visualizer.viewingHandReferences.hand.rotation;
 
         HandleConversion.HandleConfiguration resultingHandle = HandleConversion.WorldToGripHandle(visualizer.targetGrip, SimpleTransform.Create(position, rotation), visualizer.viewingHand);
         if(visualizer.viewingHand == SelectedHand.Left)
