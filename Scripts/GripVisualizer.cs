@@ -38,6 +38,15 @@ public class GripVisualizer : MonoBehaviour
 
     public bool show = true;
     public TargetGrip targetGrip;
+    public Transform gripTarget
+    {
+        get
+        {
+            if(targetGrip == null) return null;
+            if(targetGrip.targetTransform == null) return targetGrip.transform;
+            return targetGrip.targetTransform;
+        }
+    }
 
     public SelectedHand viewingHand;
 
@@ -46,6 +55,7 @@ public class GripVisualizer : MonoBehaviour
 
     public HandReference rightHandReferences;
     public HandReference leftHandReferences;
+    public HandReference viewingHandReferences => viewingHand == SelectedHand.Left ? leftHandReferences : rightHandReferences;
 
     void SetActiveHands(bool left, bool right)
     {
@@ -84,7 +94,8 @@ public class GripVisualizer : MonoBehaviour
         artHandle = handle;
 
         SimpleTransform target = SimpleTransform.Create(gripTarget);
-        SimpleTransform artHandInWorld = target.Transform(artHandle.inverse).Transform(Vector3.zero, Quaternion.Euler(-90, 90, 0));
+        Quaternion handToArtRot = viewingLeft ? Quaternion.Euler(-90, 90, 0) : Quaternion.Euler(90, -90, 0);
+        SimpleTransform artHandInWorld = target.Transform(artHandle.inverse).Transform(Vector3.zero, handToArtRot);
 
         HandReference visualHand = viewingLeft ? leftHandReferences : rightHandReferences;
         SimpleTransform handBaseInWorld = artHandInWorld.Transform(visualHand.handBaseToHand.inverse);

@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:DropdownField label="Editor Mode" index="0" choices="None, Visualize" name="ModeDropdown" />
-    <ui:VisualElement name="VisualizeMode" style="margin-top: 10px;">
+    <ui:DropdownField label="Editor Mode" index="0" choices="None,Visualize,Edit" name="ModeDropdown" />
+    <ui:VisualElement name="VisualizeMode" style="margin-top: 10px; display: none;">
         <ui:Label text="Hand Pose Visualizer" display-tooltip-when-elided="true" style="-unity-text-align: upper-center;" />
         <ui:DropdownField label="Hand" index="0" choices="Left, Right" name="VisualizeHandDropdown" />
         <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-left: 2px;">
@@ -14,4 +14,5 @@
             <ui:Label text="0, 0, 0" display-tooltip-when-elided="true" name="VisualizePryVector" style="margin-left: 5px; margin-right: 5px;" />
         </ui:VisualElement>
     </ui:VisualElement>
+    <ui:VisualElement name="EditMode" />
 </ui:UXML>

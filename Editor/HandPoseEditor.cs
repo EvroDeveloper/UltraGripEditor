@@ -7,6 +7,7 @@ using System;
 using UnityEditor.Overlays;
 using UnityEditor;
 using UnityEngine.UIElements;
+using UltraGripEditor;
 
 using static GripVisualizer;
 
@@ -36,7 +37,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
             if (Selection.activeGameObject != null)
             {
                 TargetGrip potentialGrip = Selection.activeGameObject.GetComponent<TargetGrip>();
-                if (potentialGrip != null)
+                if (potentialGrip != null && potentialGrip.handPose != null)
                 {
                     if(!_lastVisible || potentialGrip != lastSelectedTargetGrip)
                     {
@@ -55,14 +56,51 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         }
     }
 
+    private void OnSceneGUI(SceneView sceneView)
+    {
+        if(visualizer == null) return;
+        if(visualizer.targetGrip == null) return;
+        if(overlayMode == 2) DrawEditorHandles();
+    }
+
+    void DrawEditorHandles()
+    {
+        Vector3 position = visualizer.viewingHandReferences.hand.position;
+        Quaternion rotation = visualizer.viewingHandReferences.hand.rotation;
+        Handles.TransformHandle(ref position, ref rotation);
+        HandleConversion.HandleConfiguration resultingHandle = HandleConversion.WorldToGripHandle(visualizer.targetGrip, SimpleTransform.Create(position, rotation), visualizer.viewingHand);
+        if(visualizer.viewingHand == SelectedHand.Left)
+        {
+            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].leftHandle = resultingHandle.handle;
+            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].invLeftHandle = resultingHandle.invHandle;
+            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].leftArtHandle = resultingHandle.artHandle;
+        }
+        else
+        {
+            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].rightHandle = resultingHandle.handle;
+            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].invRightHandle = resultingHandle.invHandle;
+            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].rightArtHandle = resultingHandle.artHandle;
+        }
+    }
+
     private void OnGripSelected(TargetGrip grip)
     {
         if(visualizerObject == null) CreateVisualizer();
         visualizer.targetGrip = grip;
-        if(radiusSlider != null) 
+
+        radiusIndex = Math.Clamp(radiusIndex, 0, visualizer.targetGrip.handPose.poseData.Length - 1);
+        pryIndex = Math.Clamp(pryIndex, 0, visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray.Length - 1);
+
+        if(radiusSlider != null)
+        {
             radiusSlider.highValue = visualizer.targetGrip.handPose.poseData.Length - 1;
-        if(prySlider != null) 
+            radiusSlider.value = radiusIndex;
+        }
+        if(prySlider != null)
+        {
             prySlider.highValue = visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray.Length - 1;
+            prySlider.value = pryIndex;
+        }
     }
 
     private void OnGripDeselected()
@@ -139,18 +177,23 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
 
     void UpdatePanelContent()
     {
-        if(overlayMode == 0)
+        if (overlayMode == 0)
         {
             visualizerGroup.style.display = DisplayStyle.None;
         }
-        else
+        else if (overlayMode == 1)
         {
             visualizerGroup.style.display = DisplayStyle.Flex;
+        }
+        else if (overlayMode == 2)
+        {
+            visualizerGroup.style.display = DisplayStyle.None;
         }
     }
 
     public override void OnCreated()
     {
+        SceneView.duringSceneGui += OnSceneGUI;
         base.OnCreated();
     }
 
@@ -159,7 +202,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         if(visualizerObject != null) GameObject.DestroyImmediate(visualizerObject);
         GameObject visualizerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(VISUALIZER_PATH);
         visualizerObject = GameObject.Instantiate(visualizerPrefab);
-        //visualizerObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
+        visualizerObject.hideFlags = /*HideFlags.HideInHierarchy |*/ HideFlags.DontSave;
         visualizer = visualizerObject.GetComponent<GripVisualizer>();
         visualizer.show = overlayMode != 0;
         visualizer.viewingHand = selectedHand;
