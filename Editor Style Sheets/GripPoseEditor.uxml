@@ -14,5 +14,14 @@
             <ui:Label text="0, 0, 0" display-tooltip-when-elided="true" name="VisualizePryVector" style="margin-left: 5px; margin-right: 5px;" />
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement name="EditMode" />
+    <ui:VisualElement name="EditMode" style="margin-top: 10px;">
+        <ui:Label text="Hand Pose Editor" display-tooltip-when-elided="true" style="-unity-text-align: upper-center;" />
+        <ui:VisualElement name="EditOff">
+            <ui:Button text="Begin Editing" display-tooltip-when-elided="true" name="BeginEditing" />
+        </ui:VisualElement>
+        <ui:VisualElement name="EditOn" style="flex-direction: row; display: none;">
+            <ui:Button text="Cancel" display-tooltip-when-elided="true" name="CancelEditing" style="flex-grow: 1;" />
+            <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveEditing" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
 </ui:UXML>

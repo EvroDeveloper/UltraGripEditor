@@ -26,8 +26,12 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
     private int radiusIndex = 0;
     private int pryIndex = 0;
     private VisualElement visualizerGroup;
+    private VisualElement editorGroup;
+    private VisualElement editOff;
+    private VisualElement editOn;
     private SliderInt radiusSlider;
     private SliderInt prySlider;
+    private PoseDataReference currentEditingPose;
 
     private bool _lastVisible = false;
     public bool visible
@@ -65,28 +69,31 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
 
     void DrawEditorHandles()
     {
-        Vector3 position = visualizer.viewingHandReferences.hand.position;
-        Quaternion rotation = visualizer.viewingHandReferences.hand.rotation;
-        Handles.TransformHandle(ref position, ref rotation);
-
-        if((visualizer.viewingHandReferences.hand.position - position).sqrMagnitude < 0.00001 && Quaternion.Angle(visualizer.viewingHandReferences.hand.rotation, rotation) < 0.1) return;
-
-        // Sometimes hand drifts off when not doing anything because im converting the positions in a lot of different spaces. Uhh fix maybe bc yea
-        if((visualizer.viewingHandReferences.hand.position - position).sqrMagnitude < 0.00001) position = visualizer.viewingHandReferences.hand.position;
-        if(Quaternion.Angle(visualizer.viewingHandReferences.hand.rotation, rotation) < 0.1) rotation = visualizer.viewingHandReferences.hand.rotation;
-
-        HandleConversion.HandleConfiguration resultingHandle = HandleConversion.WorldToGripHandle(visualizer.targetGrip, SimpleTransform.Create(position, rotation), visualizer.viewingHand);
-        if(visualizer.viewingHand == SelectedHand.Left)
+        if(currentEditingPose != null)
         {
-            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].leftHandle = resultingHandle.handle;
-            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].invLeftHandle = resultingHandle.invHandle;
-            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].leftArtHandle = resultingHandle.artHandle;
-        }
-        else
-        {
-            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].rightHandle = resultingHandle.handle;
-            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].invRightHandle = resultingHandle.invHandle;
-            visualizer.targetGrip.handPose.poseData[radiusIndex].poseArray[pryIndex].rightArtHandle = resultingHandle.artHandle;
+            Vector3 position = visualizer.viewingHandReferences.hand.position;
+            Quaternion rotation = visualizer.viewingHandReferences.hand.rotation;
+            Handles.TransformHandle(ref position, ref rotation);
+
+            if((visualizer.viewingHandReferences.hand.position - position).sqrMagnitude < 0.00001 && Quaternion.Angle(visualizer.viewingHandReferences.hand.rotation, rotation) < 0.1) return;
+
+            // Sometimes hand drifts off when not doing anything because im converting the positions in a lot of different spaces. Uhh fix maybe bc yea
+            if((visualizer.viewingHandReferences.hand.position - position).sqrMagnitude < 0.00001) position = visualizer.viewingHandReferences.hand.position;
+            if(Quaternion.Angle(visualizer.viewingHandReferences.hand.rotation, rotation) < 0.1) rotation = visualizer.viewingHandReferences.hand.rotation;
+
+            HandleConversion.HandleConfiguration resultingHandle = HandleConversion.WorldToGripHandle(visualizer.targetGrip, SimpleTransform.Create(position, rotation), visualizer.viewingHand);
+            if(visualizer.viewingHand == SelectedHand.Left)
+            {
+                currentEditingPose.poseData.leftHandle = resultingHandle.handle;
+                currentEditingPose.poseData.invLeftHandle = resultingHandle.invHandle;
+                currentEditingPose.poseData.leftArtHandle = resultingHandle.artHandle;
+            }
+            else
+            {
+                currentEditingPose.poseData.rightHandle = resultingHandle.handle;
+                currentEditingPose.poseData.invRightHandle = resultingHandle.invHandle;
+                currentEditingPose.poseData.rightArtHandle = resultingHandle.artHandle;
+            }
         }
     }
 
@@ -175,11 +182,51 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         radiusSlider.value = radiusIndex;
         radiusLabel.text = $"{visualizer.targetGrip.handPose.poseData[radiusIndex].radius}";
 
-        
+        editorGroup = tree.Q<VisualElement>("EditMode");
+        editOff = tree.Q<VisualElement>("EditOff");
+        editOn = tree.Q<VisualElement>("EditOn");
+
+        Button startEditButton = tree.Q<Button>("BeginEditing");
+        startEditButton.clicked += StartEditing;
+        Button cancelEditButton = tree.Q<Button>("CancelEditing");
+        cancelEditButton.clicked += CancelEditing;
+        Button saveEditButton = tree.Q<Button>("SaveEditing");
+        saveEditButton.clicked += EndEditing;
+
         UpdatePanelContent();
 
         rootVisualElement.Add(tree);
         return rootVisualElement;
+    }
+
+    void StartEditing()
+    {
+        PoseDataReference startingPoseData = new(visualizer.CurrentPoseData);
+        if(startingPoseData == null) return;
+
+        currentEditingPose = startingPoseData;
+        visualizer.poseDataOverride = currentEditingPose;
+
+        editOff.style.display = DisplayStyle.None;
+        editOn.style.display = DisplayStyle.Flex;
+    }
+
+    void EndEditing()
+    {
+        visualizer.SetPoseData(currentEditingPose.poseData);
+
+        currentEditingPose = null;
+        visualizer.poseDataOverride = null;
+        editOff.style.display = DisplayStyle.Flex;
+        editOn.style.display = DisplayStyle.None;
+    }
+
+    void CancelEditing()
+    {
+        currentEditingPose = null;
+        visualizer.poseDataOverride = null;
+        editOff.style.display = DisplayStyle.Flex;
+        editOn.style.display = DisplayStyle.None;
     }
 
     void UpdatePanelContent()
@@ -187,14 +234,17 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         if (overlayMode == 0)
         {
             visualizerGroup.style.display = DisplayStyle.None;
+            editorGroup.style.display = DisplayStyle.None;
         }
         else if (overlayMode == 1)
         {
             visualizerGroup.style.display = DisplayStyle.Flex;
+            editorGroup.style.display = DisplayStyle.None;
         }
         else if (overlayMode == 2)
         {
             visualizerGroup.style.display = DisplayStyle.None;
+            editorGroup.style.display = DisplayStyle.Flex;
         }
     }
 

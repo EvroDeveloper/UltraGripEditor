@@ -6,6 +6,16 @@ using SLZ.Marrow.Utilities;
 
 public class GripVisualizer : MonoBehaviour
 {
+    public class PoseDataReference
+    {
+        public HandPose.PoseData poseData;
+
+        public PoseDataReference(HandPose.PoseData data)
+        {
+            this.poseData = data;
+        }
+    }
+
     public enum SelectedHand
     {
         Left,
@@ -38,6 +48,25 @@ public class GripVisualizer : MonoBehaviour
 
     public bool show = true;
     public TargetGrip targetGrip;
+    public PoseDataReference poseDataOverride { get; set; }
+    public HandPose.PoseDataGroup CurrentPoseDataGroup
+    {
+        get
+        {
+            if(targetGrip == null) return default;
+            if(targetGrip.handPose == null) return default;
+            return targetGrip.handPose.poseData[radiusIndex];
+        }
+    }
+    public HandPose.PoseData CurrentPoseData
+    {
+        get
+        {
+            if(poseDataOverride != null) return poseDataOverride.poseData;
+            return CurrentPoseDataGroup.poseArray[pryIndex];
+        }
+    }
+
     public Transform gripTarget
     {
         get
@@ -56,6 +85,19 @@ public class GripVisualizer : MonoBehaviour
     public HandReference rightHandReferences;
     public HandReference leftHandReferences;
     public HandReference viewingHandReferences => viewingHand == SelectedHand.Left ? leftHandReferences : rightHandReferences;
+
+    public void SetPoseData(int groupIndex, int dataIndex, HandPose.PoseData data)
+    {
+        if(targetGrip == null) return;
+        if(targetGrip.handPose == null) return;
+
+        targetGrip.handPose.poseData[groupIndex].poseArray[dataIndex] = data;
+    }
+
+    public void SetPoseData(HandPose.PoseData data)
+    {
+        SetPoseData(radiusIndex, pryIndex, data);
+    }
 
     void SetActiveHands(bool left, bool right)
     {
@@ -82,7 +124,7 @@ public class GripVisualizer : MonoBehaviour
         radiusIndex = Mathf.Clamp(radiusIndex, 0, handPose.poseData.Length - 1);
         pryIndex = Mathf.Clamp(pryIndex, 0, handPose.poseData[radiusIndex].poseArray.Length - 1);
 
-        var selectedPry = handPose.poseData[radiusIndex].poseArray[pryIndex];
+        var selectedPry = CurrentPoseData;
 
         bool viewingLeft = viewingHand == SelectedHand.Left;
 
