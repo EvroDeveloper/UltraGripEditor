@@ -76,9 +76,11 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
 
             foreach(Transform bone in transforms)
             {
+                float boneHandleSize = HandleUtility.GetHandleSize(bone.position);
+
                 if(bone != currentEditingBone)
                 {
-                    float handleSize = HandleUtility.GetHandleSize(bone.position) * 0.15f;
+                    float handleSize = boneHandleSize * 0.15f;
                     Handles.color = Color.green;
                     if(Handles.Button(bone.position, Quaternion.identity, handleSize, handleSize, Handles.SphereHandleCap))
                     {
@@ -88,7 +90,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
                 else
                 {
                     // This bone is SELECTED. #Goated
-                    float handleSize = HandleUtility.GetHandleSize(bone.position) * 0.25f;
+                    float handleSize = boneHandleSize * 0.25f;
                     Handles.color = Color.red;
                     if(Handles.Button(bone.position, Quaternion.identity, handleSize, handleSize, Handles.SphereHandleCap))
                     {
@@ -154,109 +156,78 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
                     }
                     else if(bone == visualizer.viewingHandReferences.index2)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.index2 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.index2, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.index3)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.index3 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.index3, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.middle2)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.middle2 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.middle2, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.middle3)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.middle3 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.middle3, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.ring2)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.ring2 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.ring2, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.ring3)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.ring3 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.ring3, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.pinky2)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.pinky2 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.pinky2, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.pinky3)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.pinky3 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.pinky3, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.thumb2)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.thumb2 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.thumb2, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                     else if(bone == visualizer.viewingHandReferences.thumb3)
                     {
-                        float dingus = HandleUtility.GetHandleSize(bone.position) * 1f;
                         Handles.color = Color.blue;
-                        Quaternion newRot = Handles.Disc(bone.rotation, bone.position, bone.forward, dingus, false, 0f);
-                        Quaternion delta = Quaternion.Inverse(bone.rotation) * newRot;
-                        delta.ToAngleAxis(out float deltaAngle, out Vector3 axis);
-                        if (Vector3.Dot(axis, bone.forward) < 0) deltaAngle = -deltaAngle;
-                        currentEditingPose.poseData.thumb3 += deltaAngle;
+                        DrawAngleHandle(ref currentEditingPose.poseData.thumb3, bone.position, bone.rotation, bone.forward, boneHandleSize);
                     }
                 }
             }
-
-            
         }
+    }
+
+    float DrawAngleHandle(ref float angle, Vector3 position, Quaternion rotation, Vector3 axis, float size)
+    {
+        Quaternion newRot = Handles.Disc(rotation, position, axis, size, false, 0f);
+
+        Quaternion deltaRot = newRot * Quaternion.Inverse(rotation);
+        deltaRot.ToAngleAxis(out float deltaAngle, out Vector3 deltaAxis);
+
+        if (deltaAngle > 180f)
+            deltaAngle -= 360f;
+
+        if (Vector3.Dot(deltaAxis, axis) < 0f)
+            deltaAngle = -deltaAngle;
+
+        angle += deltaAngle;
+
+        if (angle > 180f)
+            angle -= 360f;
+
+        return deltaAngle;
     }
 
     private void OnGripSelected(TargetGrip grip)
