@@ -34,6 +34,9 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
     private PoseDataReference currentEditingPose;
     private Transform currentEditingBone;
 
+    private Stack<HandPose.PoseData> editingPoseUndoStack = new Stack<HandPose.PoseData>();
+    private Stack<HandPose.PoseData> editingPoseRedoStack = new Stack<HandPose.PoseData>();
+
     private bool _lastVisible = false;
     public bool visible
     {
@@ -73,6 +76,19 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         if(currentEditingPose != null)
         {
             Transform[] transforms = visualizer.viewingHandReferences.MoveableBoneList;
+
+            Event e = Event.current;
+
+            if (e.type == EventType.MouseDown && e.button == 0)
+            {
+                if(editingPoseUndoStack.Count == 0 || !editingPoseUndoStack.Peek().Equals(currentEditingPose.poseData))
+                {
+                    editingPoseUndoStack.Push(currentEditingPose.poseData);
+                    editingPoseRedoStack.Clear();
+                }
+            }
+
+            EditorGUI.BeginChangeCheck();
 
             foreach(Transform bone in transforms)
             {
@@ -206,7 +222,31 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
                     }
                 }
             }
+
+            if(EditorGUI.EndChangeCheck())
+            {
+            }
         }
+    }
+
+    void UndoEdit()
+    {
+        if(editingPoseUndoStack.Count == 0) return;
+
+        HandPose.PoseData latestPose = editingPoseUndoStack.Pop();
+        editingPoseRedoStack.Push(latestPose);
+
+        currentEditingPose.poseData = latestPose;
+    }
+
+    void RedoEdit()
+    {
+        if(editingPoseRedoStack.Count == 0) return;
+
+        HandPose.PoseData latestRedo = editingPoseRedoStack.Pop();
+        editingPoseUndoStack.Push(latestRedo);
+
+        currentEditingPose.poseData = latestRedo;
     }
 
     float DrawAngleHandle(ref float angle, Vector3 position, Quaternion rotation, Vector3 axis, float size)
@@ -326,6 +366,11 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         Button saveEditButton = tree.Q<Button>("SaveEditing");
         saveEditButton.clicked += EndEditing;
 
+        Button editUndo = tree.Q<Button>("EditUndo");
+        editUndo.clicked += UndoEdit;
+        Button editRedo = tree.Q<Button>("EditRedo");
+        editRedo.clicked += RedoEdit;
+
         UpdatePanelContent();
 
         rootVisualElement.Add(tree);
@@ -334,7 +379,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
 
     void StartEditing()
     {
-        PoseDataReference startingPoseData = new(visualizer.CurrentPoseData);
+        PoseDataReference startingPoseData = new PoseDataReference(visualizer.CurrentPoseData);
         if(startingPoseData == null) return;
 
         currentEditingPose = startingPoseData;
@@ -348,6 +393,9 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
     {
         visualizer.SetPoseData(currentEditingPose.poseData);
 
+        editingPoseUndoStack.Clear();
+        editingPoseRedoStack.Clear();
+
         currentEditingPose = null;
         currentEditingBone = null;
         visualizer.poseDataOverride = null;
@@ -357,6 +405,9 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
 
     void CancelEditing()
     {
+        editingPoseUndoStack.Clear();
+        editingPoseRedoStack.Clear();
+
         currentEditingPose = null;
         currentEditingBone = null;
         visualizer.poseDataOverride = null;
