@@ -19,12 +19,13 @@
         <ui:VisualElement name="EditOff" style="margin-top: 10px;">
             <ui:Button text="Begin Editing" display-tooltip-when-elided="true" name="BeginEditing" />
         </ui:VisualElement>
-        <ui:VisualElement name="EditOn" style="flex-direction: column; display: none; align-items: center; margin-top: 10px;">
-            <ui:IMGUIContainer style="flex-direction: row; width: 50%;">
+        <ui:VisualElement name="EditOn" style="display: none; align-items: center; margin-top: 10px;">
+            <ui:Button text="Mirror Handle" display-tooltip-when-elided="true" name="EditMirrorHandle" style="display: flex; width: 50%;" />
+            <ui:IMGUIContainer style="flex-direction: row; width: 50%; flex-shrink: 0; flex-grow: 1;">
                 <ui:Button text="Undo" display-tooltip-when-elided="true" name="EditUndo" style="flex-grow: 1;" />
                 <ui:Button text="Redo" display-tooltip-when-elided="true" name="EditRedo" style="flex-grow: 1;" />
             </ui:IMGUIContainer>
-            <ui:IMGUIContainer style="flex-direction: row; flex-grow: 1;">
+            <ui:IMGUIContainer style="flex-direction: row; flex-grow: 1; flex-shrink: 0;">
                 <ui:Button text="Cancel" display-tooltip-when-elided="true" name="CancelEditing" style="flex-grow: 1;" />
                 <ui:Button text="Save" display-tooltip-when-elided="true" name="SaveEditing" style="flex-grow: 1;" />
             </ui:IMGUIContainer>

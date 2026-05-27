@@ -37,6 +37,23 @@ namespace UltraGripEditor
             };
         }
 
+        public static HandleConfiguration FlipHandle(HandleConfiguration handleConfiguration)
+        {
+            HandleConfiguration output = new()
+            {
+                handle = SimpleTransform.Create(handleConfiguration.handle),
+                artHandle = SimpleTransform.Create(handleConfiguration.artHandle)
+            };
+            output.handle.position = Vector3.Scale(output.handle.position, new Vector3(-1, 1, 1));
+            output.handle.rotation = Quaternion.Euler(Vector3.Scale(output.handle.rotation.eulerAngles, new Vector3(1, -1, -1)));
+            output.invHandle = output.handle.inverse;
+
+            output.artHandle.position = Vector3.Scale(output.artHandle.position, new Vector3(-1, 1, 1));
+            output.artHandle.rotation = Quaternion.Euler(Vector3.Scale(output.artHandle.rotation.eulerAngles, new Vector3(1, -1, -1)));
+
+            return output;
+        }
+
         // public static (HandleConfiguration, HandleConfiguration) WorldToGripHandle_BothHands(TargetGrip grip, SimpleTransform artHandInWorld, Handedness basedHandedness, MirrorType mirrorType)
         // {
         //     if(basedHandedness != Handedness.Left && basedHandedness != Handedness.Right) return (null, null);

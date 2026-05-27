@@ -371,10 +371,47 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         Button editRedo = tree.Q<Button>("EditRedo");
         editRedo.clicked += RedoEdit;
 
+        Button editMirrorHandle = tree.Q<Button>("EditMirrorHandle");
+        editMirrorHandle.clicked += MirrorHandle;
+
         UpdatePanelContent();
 
         rootVisualElement.Add(tree);
         return rootVisualElement;
+    }
+
+    void MirrorHandle()
+    {
+        if(currentEditingPose == null) return;
+
+        Vector3 position = visualizer.viewingHandReferences.hand.position;
+        Quaternion rotation = visualizer.viewingHandReferences.hand.rotation;
+
+        HandleConversion.HandleConfiguration currentHandleConfig = HandleConversion.WorldToGripHandle(visualizer.targetGrip, new SimpleTransform(position, rotation), visualizer.viewingHand);
+        HandleConversion.HandleConfiguration flippedHandleConfig = HandleConversion.FlipHandle(currentHandleConfig);
+        
+        if(visualizer.viewingHand == SelectedHand.Left)
+        {
+            // Update current just to be safe
+            currentEditingPose.poseData.leftHandle = currentHandleConfig.handle;
+            currentEditingPose.poseData.invLeftHandle = currentHandleConfig.invHandle;
+            currentEditingPose.poseData.leftArtHandle = currentHandleConfig.artHandle;
+
+            // Apply flipped handle
+            currentEditingPose.poseData.rightHandle = flippedHandleConfig.handle;
+            currentEditingPose.poseData.invRightHandle = flippedHandleConfig.invHandle;
+            currentEditingPose.poseData.rightArtHandle = flippedHandleConfig.artHandle;
+        }
+        else
+        {
+            currentEditingPose.poseData.leftHandle = flippedHandleConfig.handle;
+            currentEditingPose.poseData.invLeftHandle = flippedHandleConfig.invHandle;
+            currentEditingPose.poseData.leftArtHandle = flippedHandleConfig.artHandle;
+
+            currentEditingPose.poseData.rightHandle = currentHandleConfig.handle;
+            currentEditingPose.poseData.invRightHandle = currentHandleConfig.invHandle;
+            currentEditingPose.poseData.rightArtHandle = currentHandleConfig.artHandle;
+        }
     }
 
     void StartEditing()
