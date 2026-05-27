@@ -44,6 +44,22 @@ public class GripVisualizer : MonoBehaviour
         public Transform thumb2;
         public Transform thumb3;
         public SimpleTransform handBaseToHand;
+
+        private Transform[] _moveableBoneList;
+        public Transform[] MoveableBoneList
+        {
+            get
+            {
+                if(_moveableBoneList == null)
+                {
+                    _moveableBoneList = new Transform[]
+                    {
+                        hand, index1, index2, index3, middle1, middle2, middle3, ring1, ring2, ring3, pinky1, pinky2, pinky3, thumb1, thumb2, thumb3
+                    };
+                }
+                return _moveableBoneList;
+            }
+        }
     }
 
     public bool show = true;
