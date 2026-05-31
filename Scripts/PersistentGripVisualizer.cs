@@ -33,6 +33,7 @@ namespace UltraGripEditor
             activeVisualizer.targetGrip = thisgrip;
             activeVisualizer.show = true;
             activeVisualizer.viewingHand = hand;
+            activeVisualizer.radiusSelectionMode = GripVisualizer.InterpolationMode.Interpolated;
             activeVisualizer.radiusIndex = 0;
             activeVisualizer.pryIndex = 0;
         }
@@ -42,6 +43,11 @@ namespace UltraGripEditor
             if(activeVisualizerObject == null) CreateVisualizer();
             activeVisualizer.viewingHand = hand;
             activeVisualizer.UpdateFingers();
+        }
+
+        void Update()
+        {
+            if(activeVisualizer != null) activeVisualizer.UpdateFingers();
         }
 
         void OnEnable()
@@ -62,7 +68,7 @@ namespace UltraGripEditor
 
         void OnDestroy()
         {
-            DestroyImmediate(activeVisualizer);
+            DestroyImmediate(activeVisualizerObject);
         }
     }
 }

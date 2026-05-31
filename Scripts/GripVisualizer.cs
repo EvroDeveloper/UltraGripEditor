@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using SLZ.Marrow;
 using SLZ.Marrow.Utilities;
+using UltraGripEditor;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
+[ExecuteInEditMode]
 public class GripVisualizer : MonoBehaviour
 {
     public class PoseDataReference
@@ -23,6 +26,12 @@ public class GripVisualizer : MonoBehaviour
     {
         Left,
         Right
+    }
+
+    public enum InterpolationMode
+    {
+        Index,
+        Interpolated,
     }
 
     [System.Serializable]
@@ -74,7 +83,10 @@ public class GripVisualizer : MonoBehaviour
         {
             if(targetGrip == null) return default;
             if(targetGrip.handPose == null) return default;
-            return targetGrip.handPose.poseData[radiusIndex];
+            if(radiusSelectionMode == InterpolationMode.Index)
+                return targetGrip.handPose.poseData[radiusIndex];
+            else
+                return PoseLerper.GetPoseGroupAtRadius(targetGrip.handPose, targetGrip.radius);
         }
     }
     public HandPose.PoseData CurrentPoseData
@@ -97,6 +109,8 @@ public class GripVisualizer : MonoBehaviour
     }
 
     public SelectedHand viewingHand;
+    
+    public InterpolationMode radiusSelectionMode = InterpolationMode.Index;
 
     public int radiusIndex;
     public int pryIndex;
@@ -133,7 +147,7 @@ public class GripVisualizer : MonoBehaviour
     {
         UpdateFingers();
     }
-    
+
     [ContextMenu("Update Vis")]
     public void UpdateFingers()
     {
@@ -148,7 +162,7 @@ public class GripVisualizer : MonoBehaviour
         radiusIndex = Mathf.Clamp(radiusIndex, 0, handPose.poseData.Length - 1);
         pryIndex = Mathf.Clamp(pryIndex, 0, handPose.poseData[radiusIndex].poseArray.Length - 1);
 
-        var selectedPry = CurrentPoseData;
+        HandPose.PoseData selectedPry = CurrentPoseData;
 
         bool viewingLeft = viewingHand == SelectedHand.Left;
 
