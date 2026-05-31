@@ -20,6 +20,7 @@ namespace UltraGripEditor
 
         void CreateVisualizer()
         {
+            if(!TryGetComponent<TargetGrip>(out var thisgrip)) return;
             GameObject visualizerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath("bf692f29001bd42aab4da2220b211fb0"));
             
             activeVisualizerObject = GameObject.Instantiate(visualizerPrefab);
@@ -29,7 +30,7 @@ namespace UltraGripEditor
             activeVisualizerObject.transform.localRotation = Quaternion.identity;
 
             activeVisualizer = activeVisualizerObject.GetComponent<GripVisualizer>();
-            activeVisualizer.targetGrip = GetComponent<TargetGrip>();
+            activeVisualizer.targetGrip = thisgrip;
             activeVisualizer.show = true;
             activeVisualizer.viewingHand = hand;
             activeVisualizer.radiusIndex = 0;
@@ -52,8 +53,11 @@ namespace UltraGripEditor
 
         void OnDisable()
         {
-            activeVisualizer.show = false;
-            activeVisualizer.UpdateFingers();
+            if(activeVisualizerObject != null)
+            {
+                activeVisualizer.show = false;
+                activeVisualizer.UpdateFingers();
+            }
         }
 
         void OnDestroy()

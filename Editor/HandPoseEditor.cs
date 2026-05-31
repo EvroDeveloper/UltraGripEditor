@@ -31,6 +31,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
     private VisualElement editOn;
     private SliderInt radiusSlider;
     private SliderInt prySlider;
+    private GameObject editingSelectedObject;
     private PoseDataReference currentEditingPose;
     private Transform currentEditingBone;
 
@@ -75,9 +76,20 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
     {
         if(currentEditingPose != null)
         {
+            if(editingSelectedObject != null)
+                Selection.activeGameObject = editingSelectedObject;
+
             Transform[] transforms = visualizer.viewingHandReferences.MoveableBoneList;
 
             Event e = Event.current;
+
+            int controlId = GUIUtility.GetControlID(FocusType.Passive);
+
+            if (e.type == EventType.Layout)
+            {
+                // Makes this tool the default thing that receives mouse clicks
+                HandleUtility.AddDefaultControl(controlId);
+            }
 
             if (e.type == EventType.MouseDown && e.button == 0)
             {
@@ -420,6 +432,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
         if(startingPoseData == null) return;
 
         currentEditingPose = startingPoseData;
+        editingSelectedObject = visualizer.targetGrip.gameObject;
         visualizer.poseDataOverride = currentEditingPose;
 
         editOff.style.display = DisplayStyle.None;
@@ -430,14 +443,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
     {
         visualizer.SetPoseData(currentEditingPose.poseData);
 
-        editingPoseUndoStack.Clear();
-        editingPoseRedoStack.Clear();
-
-        currentEditingPose = null;
-        currentEditingBone = null;
-        visualizer.poseDataOverride = null;
-        editOff.style.display = DisplayStyle.Flex;
-        editOn.style.display = DisplayStyle.None;
+        CancelEditing();
     }
 
     void CancelEditing()
@@ -447,6 +453,7 @@ public class HandPoseEditorOverlay : Overlay, ITransientOverlay
 
         currentEditingPose = null;
         currentEditingBone = null;
+        editingSelectedObject = null;
         visualizer.poseDataOverride = null;
         editOff.style.display = DisplayStyle.Flex;
         editOn.style.display = DisplayStyle.None;

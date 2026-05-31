@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using SLZ.Marrow;
 using SLZ.Marrow.Utilities;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class GripVisualizer : MonoBehaviour
 {
@@ -107,7 +110,12 @@ public class GripVisualizer : MonoBehaviour
         if(targetGrip == null) return;
         if(targetGrip.handPose == null) return;
 
+        Undo.RecordObject(targetGrip.handPose, "Edit HandPose");
         targetGrip.handPose.poseData[groupIndex].poseArray[dataIndex] = data;
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(targetGrip.handPose);
+        AssetDatabase.SaveAssets();
+#endif
     }
 
     public void SetPoseData(HandPose.PoseData data)
