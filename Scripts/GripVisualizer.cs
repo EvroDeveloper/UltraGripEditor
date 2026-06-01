@@ -124,9 +124,9 @@ public class GripVisualizer : MonoBehaviour
         if(targetGrip == null) return;
         if(targetGrip.handPose == null) return;
 
+#if UNITY_EDITOR
         Undo.RecordObject(targetGrip.handPose, "Edit HandPose");
         targetGrip.handPose.poseData[groupIndex].poseArray[dataIndex] = data;
-#if UNITY_EDITOR
         EditorUtility.SetDirty(targetGrip.handPose);
         AssetDatabase.SaveAssets();
 #endif
