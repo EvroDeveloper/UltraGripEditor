@@ -28,7 +28,7 @@ namespace UltraGripEditor
         {
             HandPose handPose = Selection.activeObject as HandPose;
             if(handPose == null) return;
-            var wizard = ScriptableWizard.DisplayWizard<PryGeneratorWizard>("HandPose Pry Generator", "Update Pose");
+            var wizard = ScriptableWizard.DisplayWizard<PryGeneratorWizard>("HandPose Pry Generator", "Update Pose", "Cancel");
             wizard.targetHandPose = handPose;
         }
 
@@ -49,6 +49,20 @@ namespace UltraGripEditor
             {
                 targetHandPose.GeneratePryPoses(handRotationLimit);
             }
+        }
+
+        void OnWizardOtherButton()
+        {
+            Close();
+        }
+
+        protected override bool DrawWizardGUI()
+        {
+            EditorGUILayout.HelpBox("This tool will overwrite all pry poses with rotated copies of the first pose in each radius. Only use if you know what you are doing.", MessageType.Info);
+            bool b = base.DrawWizardGUI();
+            if(!createBackup)
+                EditorGUILayout.HelpBox("No backup will be created, hand pose data may be overwritten and lost", MessageType.Warning);
+            return b;
         }
 
         static void BackUpHandPose(HandPose handPose)
